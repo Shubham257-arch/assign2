@@ -37,11 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'note',
+    'note',  # Update this to reflect the correct path
     'rest_framework',
-    'user',
-    'corsheaders'
-
+    'users',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [

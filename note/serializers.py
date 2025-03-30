@@ -4,7 +4,7 @@ from rest_framework import serializers
 from .models import Note
 
 class NoteSerializer(serializers.ModelSerializer):
-    Username = serializers.ReadOnlyField(source='user.username')
+    Username = serializers.ReadOnlyField(source='users.username')
     class Meta:
         model = Note
-        fields = ['id ,title ,content ,Username' ,'user']
+        fields = ['id ,title ,content ,Username' ,'users']
