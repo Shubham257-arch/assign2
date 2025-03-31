@@ -1,7 +1,7 @@
 from contextvars import Token
 from urllib import request
 from django.contrib.auth.models import User  # Correct import
-
+from django.contrib.auth.views import LoginView
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
