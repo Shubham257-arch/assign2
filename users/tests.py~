@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
@@ -39,4 +40,18 @@ def test_login_user_success(self):
     }
     response = self.client.post(login_url, login_data, format="json")
     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    self.user = u
+    self.user = user(username="testuser", password="testpassword123")
+
+
+def test_register_user_success(self):
+    print("✅ user.tests.py loaded")
+    url = reverse('register')  # Make sure you name your URL pattern as 'register'
+    data = {
+        'username': 'testuser',
+        'password': 'testpassword123',
+        'email': 'test@example.com'  # Ensure email is included
+    }
+    response = self.client.post(url, data, format="json")
+    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    self.assertEqual(User.objects.count(), 1)
+    self.assertEqual(User.objects.get().username, 'testuser')
