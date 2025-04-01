@@ -5,7 +5,6 @@ from rest_framework import status
 from .models import Note
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-
 class NoteViewManual(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]

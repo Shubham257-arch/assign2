@@ -1,0 +1,201 @@
+from rest_framework.test import APITestCase
+from rest_framework import status
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from .models import Note
+
+class NoteViewManualTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='test123')
+        self.token = Token.objects.create(user=self.user)
+        self.url = '/note/'  # Using the direct RESTful endpoint
+
+    def test_create_note_successfully(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        data = {
+            "title": "My Note",
+            "content": "This is a test note."
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("note_id", response.data)
+        self.assertEqual(Note.objects.count(), 1)
+        self.assertEqual(Note.objects.first().title, "My Note")
+        print("✅ note.tests.py > Note Create : loaded")
+
+    def test_create_note_missing_fields(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        response = self.client.post(self.url, {}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data)
+        print("✅ note.tests.py > Note Create : missing fields")
+
+    def test_unauthorized_note_creation(self):
+        response = self.client.post(self.url, {"title": "x", "content": "y"})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        print("✅ note.tests.py > Note Create : unauthorized")
+
+class NoteUpdateTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='test123')
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create a note to update
+        self.note = Note.objects.create(
+            user=self.user,
+            title="Old Title",
+            content="Old Content"
+        )
+
+        self.url = '/note/'  # your PUT endpoint
+
+    def test_update_note_successfully(self):
+        data = {
+            "note_id": self.note.id,
+            "title": "Updated Title",
+            "content": "Updated Content"
+        }
+
+        response = self.client.put(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], "Note updated successfully")
+
+        # Refresh the note from DB
+        self.note.refresh_from_db()
+        self.assertEqual(self.note.title, "Updated Title")
+        self.assertEqual(self.note.content, "Updated Content")
+        print("✅ note.tests.py > Update Note : updated")
+
+    def test_update_note_partial_fields(self):
+        data = {
+            "note_id": self.note.id,
+            "title": "New Title Only"
+        }
+
+        response = self.client.put(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.note.refresh_from_db()
+        self.assertEqual(self.note.title, "New Title Only")
+        self.assertEqual(self.note.content, "Old Content")  # Unchanged
+        print("✅ note.tests.py > Update Note : partial")
+
+    def test_update_note_unauthorized(self):
+        self.client.credentials()  # remove auth
+
+        data = {
+            "note_id": self.note.id,
+            "title": "Hacky Update"
+        }
+
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        print("✅ note.tests.py > Update Note : unauthorized")
+
+class NoteDeleteTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='test123')
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create a note to delete
+        self.note = Note.objects.create(
+            user=self.user,
+            title="Note to Delete",
+            content="This note will be deleted."
+        )
+        # Create a note to delete 2
+        self.note2 = Note.objects.create(
+            user=self.user,
+            title="Note to Delete 2",
+            content="This note will be deleted."
+        )
+
+        self.url = '/note/'  # Your delete endpoint
+
+    def test_delete_note_successfully(self):
+        data = {
+            "note_id": self.note.id
+        }
+
+        response = self.client.delete(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], "Note deleted successfully")
+        self.assertFalse(Note.objects.filter(id=self.note.id).exists())
+        print("✅ note.tests.py > Delete Note : deleted")
+
+    def test_delete_note_unauthorized(self):
+        self.client.credentials()  # Remove auth
+        data = {
+            "note_id": self.note2.id
+        }
+
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        print("✅ note.tests.py > Delete Note : unauthorized")
+
+    def test_delete_nonexistent_note(self):
+        data = {
+            "note_id": 9999  # A note ID that doesn't exist
+        }
+
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # or 404 if you handle it
+        print("✅ note.tests.py > Delete Note : non-existent")
+
+class NoteGetTest(APITestCase):
+    def setUp(self):
+        # User and token
+        self.user = User.objects.create_user(username='testuser', password='test123')
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Notes
+        self.note1 = Note.objects.create(user=self.user, title="Note 1", content="Content 1")
+        self.note2 = Note.objects.create(user=self.user, title="Note 2", content="Content 2")
+
+        self.all_notes_url = '/note/'  # GET all notes
+        self.single_note_url = f'/note/{self.note1.id}/'  # GET single note
+
+    def test_get_all_notes(self):
+        response = self.client.get(self.all_notes_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['title'], 'Note 1')
+        self.assertEqual(response.data[1]['title'], 'Note 2')
+        print("✅ note.tests.py > Get All Notes : loaded")
+
+    def test_get_single_note_successfully(self):
+        response = self.client.get(self.single_note_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.note1.id)
+        self.assertEqual(response.data['title'], 'Note 1')
+        print("✅ note.tests.py > Get Single Note : loaded")
+
+    def test_get_single_note_not_found(self):
+        invalid_note_url = '/note/9999/'  # Assuming this ID doesn't exist
+
+        response = self.client.get(invalid_note_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['detail'], 'Note not found.')
+        print("✅ note.tests.py > Get Single Note : not found")
+
+    def test_unauthenticated_access(self):
+        self.client.credentials()  # remove token
+
+        response = self.client.get(self.all_notes_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.get(self.single_note_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        print("✅ note.tests.py > Get All Notes : unauthorized")

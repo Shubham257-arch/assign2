@@ -25,6 +25,6 @@ def home(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
    path('users/', include('users.urls')),
-   path('note/', include('note.urls')),
+   path('notes/', include('note.urls')),
    path('', home),
 ]

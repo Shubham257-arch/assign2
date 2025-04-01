@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-t+nb7ktsyx!29n214k2b+ii#fvp2@dm3ffoq5s+wf1k=qo4w2^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 
 # Application definition
@@ -43,6 +44,25 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'django_errors.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -55,6 +75,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'mybackend.urls'
+CORS_ALLOW_ALL_ORIGINS = True  # Or configure specific origins
 
 TEMPLATES = [
     {
@@ -84,7 +105,7 @@ DATABASES = {
         'NAME': 'neondb',
         'USER': 'neondb_owner',
         'PASSWORD': 'npg_aNb1eQfGl9UV',
-        'HOST': 'ep-sparkling-frost-a7k6w2kb-pooler.ap-southeast-2.aws.neon.tech',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
@@ -137,3 +158,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}

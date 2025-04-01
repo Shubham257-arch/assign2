@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(6q!*vw)iqry=vigv!*zhx^)(3j^j4b791_wpynwv*0s-gx&pc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'users',
 
+
+
 ]
 LOGGING = {
     'version': 1,
@@ -52,7 +54,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': 'django_errors.log',
+            'filename': BASE_DIR / 'django_errors.log',
         },
     },
     'loggers': {
@@ -63,6 +65,7 @@ LOGGING = {
         },
     },
 }
+
 
 
 MIDDLEWARE = [
@@ -77,6 +80,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
+CORS_ALLOW_ALL_ORIGINS = True  # Or configure specific origins
 
 TEMPLATES = [
     {
@@ -106,6 +110,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 
 # Password validation
