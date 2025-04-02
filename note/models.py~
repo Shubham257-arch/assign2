@@ -1,9 +1,12 @@
-from users.models import User  # Import User model correctly
+# note/models.py
+from django.db import models
+from users.models import User  # Correct import
 
-# Create your models here.
+
 class Note(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Correct the reference to User
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Reference to custom User model
+
     def __str__(self):
         return self.title

@@ -162,8 +162,3 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',  # To ensure the user needs to be authenticated
     ]
 }
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React (local)
-    "https://cicd-frontend-ten.vercel.app",  # Production frontend
-]
