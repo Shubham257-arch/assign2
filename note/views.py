@@ -1,11 +1,12 @@
-# views.py
-from rest_framework.generics import get_object_or_404
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .models import Note
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import Note
+from .serializers import NoteSerializer
 
 class NoteViewManual(APIView):
     permission_classes = [IsAuthenticated]
@@ -32,3 +33,22 @@ class NoteViewManual(APIView):
         note = get_object_or_404(Note, id=request.data.get("note_id"))
         note.delete()
         return Response({"message": "Note deleted successfully"}, status=status.HTTP_200_OK)
+
+    def get(self, request):
+        notes = Note.objects.filter(user=request.user)  # Get only the user's notes
+        serializer = NoteSerializer(notes, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class NoteGetOneView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, note_id):  # ✅ must be 'get'
+        try:
+            note = Note.objects.get(id=note_id, user=request.user)
+        except Note.DoesNotExist:
+            return Response({'detail': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = NoteSerializer(note)
+        return Response(serializer.data, status=status.HTTP_200_OK)

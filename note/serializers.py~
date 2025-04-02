@@ -1,4 +1,4 @@
-from django.contrib.auth.models import users
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 from .models import Note
@@ -7,4 +7,6 @@ class NoteSerializer(serializers.ModelSerializer):
     Username = serializers.ReadOnlyField(source='users.username')
     class Meta:
         model = Note
-        fields = ['id ,title ,content ,Username' ,'users']
+        fields = ['id' ,'title' ,'content' ,'username' ,'users']
+
+
