@@ -1,4 +1,5 @@
 # views.py
+from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -26,3 +27,8 @@ class NoteViewManual(APIView):
         note.save()
 
         return Response({"message": "Note updated successfully"}, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        note = get_object_or_404(Note, id=request.data.get("note_id"))
+        note.delete()
+        return Response({"message": "Note deleted successfully"}, status=status.HTTP_200_OK)
