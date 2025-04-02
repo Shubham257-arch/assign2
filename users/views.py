@@ -33,9 +33,3 @@ class LoginView(APIView):
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key}, status=200)
 
-class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can log out
-
-    def post(self, request):
-        request.user.auth_token.delete()
-        return Response({"message": "Logged out successfully"}, status=200)

@@ -43,21 +43,3 @@ def test_login_user_success(self):
     self.user = user(username="testuser", password="testpassword123")
 
 
-def test_logout_user_success(self):
-    """Logout should succeed with a valid token."""
-    # 1. Create user and generate token
-    user = User.objects.create_user(username='testuser', password='testpassword123')
-    token = Token.objects.create(user=user)
-
-    # 2. Set authorization header with token
-    self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-
-    # 3. Call logout endpoint
-    response = self.client.post(self.logout_url)
-
-    # 4. Check that response status is 204 (No Content)
-    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-    # 5. Ensure that token is deleted after logout
-    with self.assertRaises(Token.DoesNotExist):
-        Token.objects.get(user=user)
