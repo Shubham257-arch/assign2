@@ -1,21 +1,21 @@
 {
-  "framework": null,
-  "builds": [
-    {
-      "src": "backend/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize":  "15mb", "runtime":  "python3.9" }
+    "builds": [
+        {
+            "src": "backend/wsgi.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "backend/wsgi.py",
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS, DELETE, PUT"
+            }
+        }
+    ],
+    "env": {
+        "PYTHON_VERSION": "3.10"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "backend/wsgi.py",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS, DELETE, PUT",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Headers" : "Authorization, Content-Type, X-CSRF-Token"
-      }
-    }
-  ]
+}
