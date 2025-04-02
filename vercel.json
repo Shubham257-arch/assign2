@@ -17,6 +17,10 @@
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Headers" : "Authorization, Content-Type, X-CSRF-Token"
       }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "backend/wsgi.py"
     }
   ]
 }
