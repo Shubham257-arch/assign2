@@ -162,7 +162,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',  # To ensure the user needs to be authenticated
     ]
 }
-<<<<<<< HEAD
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React (local)
     "https://ci-cd-assignment-frontend.vercel.app",  # Production frontend
@@ -185,10 +184,8 @@ CORS_ALLOW_HEADERS = [
     "content-type",
 ]
 CORS_ALLOW_ALL_ORIGINS = True
-=======
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React (local)
     "https://cicd-frontend-ten.vercel.app",  # Production frontend
 ]
->>>>>>> 46352ae0887de59f957552e1bb4d5b1f4b897b14
